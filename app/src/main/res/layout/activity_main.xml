@@ -12,11 +12,30 @@
         android:layout_weight="1">
     </ListView>
 
-    <CheckBox
-        android:id="@+id/autoplay"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Autoplay" />
+    <RelativeLayout
+        android:id="@+id/autoplayAndShuffle"
+        android:visibility="gone"
+        android:paddingTop="18dp"
+        android:paddingBottom="8dp"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+        <Switch
+            android:id="@+id/autoplay"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Autoplay"
+            android:paddingLeft="18dp"/>
+
+        <Button
+            android:id="@+id/shuffle"
+            android:layout_width="54dp"
+            android:layout_height="33dp"
+            android:background="@drawable/ic_shuffle"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="18dp"
+            />
+    </RelativeLayout>
 
     <LinearLayout
         android:id="@+id/playBackButtons"

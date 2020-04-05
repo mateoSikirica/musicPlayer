@@ -1,3 +1,17 @@
+////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+//SHUFFLE BUTTON ONLY PLAYS ONE RANDOM SONG, NOT YET FULLY IMPLEMENTED
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
 package com.example.musicplayer;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -17,11 +31,13 @@ import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.SeekBar;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -105,6 +121,7 @@ public class MainActivity extends AppCompatActivity {
     private int mPosition;
     private boolean flag2 = true;
     private boolean notPaused = true;
+    private boolean isVisible = false;
     private int songDuration;
     private boolean isAutoplayOn = false;
 
@@ -112,19 +129,26 @@ public class MainActivity extends AppCompatActivity {
     private TextView songDurationTextView;
     private SeekBar seekBar;
     private View playbackControls;
+    private View autoplayAndShuffle;
     private Button pauseButton;
     private Button backward10;
     private Button forward10;
     private Button prevSong;
     private Button nextSong;
-    private Button autoplay;
+    private Button shuffle;
+    private Switch autoplay;
+
 
     private void playSong() {
         final String musicFilePath = musicFilesList.get(mPosition);
         songDuration = playMusicFile(musicFilePath) / 1000; // playMusicFile returns song duration in miliseconds, divided by 1000, it is converted to seconds
         seekBar.setMax(songDuration);
-        seekBar.setVisibility(View.VISIBLE);
-        playbackControls.setVisibility(View.VISIBLE);
+        if(!isVisible) {
+            seekBar.setVisibility(View.VISIBLE);
+            playbackControls.setVisibility(View.VISIBLE);
+            autoplayAndShuffle.setVisibility(View.VISIBLE);
+            isVisible = true;
+        }
         songDurationTextView.setText(String.valueOf(songDuration / 60) + ":" + String.valueOf(songDuration % 60));
         songPosition = 0; // the second from which the song starts, if the songPosition was 3, the song would start from 3rd second
         pauseButton.setText("pause");
@@ -239,12 +263,15 @@ public class MainActivity extends AppCompatActivity {
 
             songPositionTextView = findViewById(R.id.currentPosition);
             songDurationTextView = findViewById(R.id.songDuration);
-
             pauseButton = findViewById(R.id.pauseButton);
-
             playbackControls = findViewById(R.id.playBackButtons);
-
+            autoplayAndShuffle = findViewById(R.id.autoplayAndShuffle);
             backward10 = findViewById(R.id.b10);
+            forward10 = findViewById(R.id.f10);
+            prevSong = findViewById(R.id.prevSong);
+            nextSong = findViewById(R.id.nextSong);
+            shuffle = findViewById(R.id.shuffle);
+            autoplay = findViewById(R.id.autoplay);
 
             backward10.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -260,8 +287,6 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
 
-            forward10 = findViewById(R.id.f10);
-
             forward10.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -275,8 +300,6 @@ public class MainActivity extends AppCompatActivity {
                     mp.seekTo(songPosition * 1000);
                 }
             });
-
-            prevSong = findViewById(R.id.prevSong);
 
             prevSong.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -298,8 +321,6 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
 
-            nextSong = findViewById(R.id.nextSong);
-
             nextSong.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -320,8 +341,6 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
 
-            autoplay = findViewById(R.id.autoplay);
-
             autoplay.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -329,6 +348,16 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
 
+            shuffle.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mp.stop();
+                    Random rand = new Random();
+                    mPosition = rand.nextInt( musicFilesList.size());
+                    clickedSong = mPosition;
+                    playSong();
+                }
+            });
 
             pauseButton.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -355,7 +384,7 @@ public class MainActivity extends AppCompatActivity {
                         mPosition = position;
                         playSong();
                         clickedSong = position; // clickedSong will represent last clicked song
-                        flag1 = true; // flat that is used to this if statement is executed only once, to establish clickedSong
+                        flag1 = true; // flag that is used to this if statement is executed only once, to establish clickedSong
                         flag2 = false; // flag that is used so there is only one thread created (instead of a thread for each song individually, increment problem solved)
                     }
                     else {
@@ -364,7 +393,6 @@ public class MainActivity extends AppCompatActivity {
                             mPosition = position;
                             playSong();
                         } else {
-                            playbackControls.setVisibility(View.VISIBLE);
                             if ((position != clickedSong) && isSongPlaying) { // if the user clicked a different song and if the song is playing
                                 clickedSong = position;
                                 mPosition = position;
@@ -418,7 +446,7 @@ public class MainActivity extends AppCompatActivity {
 
                 ViewHolder holder = (ViewHolder) convertView.getTag();
                 final String item = data.get(position);
-                holder.info.setText(item.substring(item.lastIndexOf('/')+1)); // '/' is used to point at filename, +1 is used so forward slash is not printed
+                holder.info.setText(item.substring(item.lastIndexOf('/') + 1)); // '/' is used to point at filename, +1 is used so forward slash is not printed
                 return convertView;
             }
 
