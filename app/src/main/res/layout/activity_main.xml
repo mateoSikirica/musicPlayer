@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <ListView
+        android:id="@+id/listView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+    </ListView>
+
+    <CheckBox
+        android:id="@+id/autoplay"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Autoplay" />
+
+    <LinearLayout
+        android:id="@+id/playBackButtons"
+        android:visibility="gone"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <TextView
+            android:paddingStart="16dp"
+            android:paddingLeft="16dp"
+            android:id="@+id/currentPosition"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"/>
+
+        <Button
+            android:id="@+id/prevSong"
+            android:layout_width="54dp"
+            android:layout_height="54dp"
+            android:background="@drawable/ic_prevsong" />
+
+        <Button
+            android:id="@+id/b10"
+            android:layout_width="52dp"
+            android:layout_height="52dp"
+            android:background="@drawable/ic_bw10" />
+
+        <Button
+            android:id="@+id/pauseButton"
+            android:text="pause"
+            android:layout_width="100dp"
+            android:layout_height="52dp" />
+
+        <Button
+            android:id="@+id/f10"
+            android:layout_width="54dp"
+            android:layout_height="54dp"
+            android:background="@drawable/ic_ff10"
+            android:paddingRight="30dp"/>
+
+
+        <Button
+            android:id="@+id/nextSong"
+            android:layout_width="52dp"
+            android:layout_height="52dp"
+            android:background="@drawable/ic_nextsong" />
+
+        <TextView
+            android:paddingEnd="16dp"
+            android:paddingRight="16dp"
+            android:gravity="end"
+            android:id="@+id/songDuration"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"/>
+    </LinearLayout>
+    <SeekBar
+        android:visibility="gone"
+        android:id="@+id/seekBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+</LinearLayout>
