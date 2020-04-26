@@ -6,8 +6,6 @@ import android.Manifest;
 import android.app.ActivityManager;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
-import android.graphics.Picture;
-import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.Bundle;
