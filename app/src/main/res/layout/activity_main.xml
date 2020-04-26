@@ -19,7 +19,7 @@
         android:paddingBottom="8dp"
         android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
+        android:layout_height="wrap_content">
         <Switch
             android:id="@+id/autoplay"
             android:layout_width="wrap_content"
@@ -90,9 +90,12 @@
             android:id="@+id/songDuration"
             android:layout_width="0dp"
             android:layout_weight="1"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content" />
     </LinearLayout>
     <SeekBar
+        android:thumb="@drawable/thumb"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
         android:visibility="gone"
         android:id="@+id/seekBar"
         android:layout_width="match_parent"

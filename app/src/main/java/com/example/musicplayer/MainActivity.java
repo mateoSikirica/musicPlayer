@@ -4,7 +4,9 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-//SHUFFLE BUTTON ONLY PLAYS ONE RANDOM SONG, NOT YET FULLY IMPLEMENTED
+//INCREASE SEEKBAR THUMB SIZE
+
+//ARCHITECURE
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -19,6 +21,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.Manifest;
 import android.app.ActivityManager;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
+import android.graphics.Picture;
+import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.Bundle;
@@ -124,7 +129,10 @@ public class MainActivity extends AppCompatActivity {
     private boolean isVisible = false;
     private int songDuration;
     private boolean isAutoplayOn = false;
+    private List<View> views = new ArrayList<>();
+    private List<Integer> positions = new ArrayList<>();
 
+    private ListView listView;
     private TextView songPositionTextView;
     private TextView songDurationTextView;
     private SeekBar seekBar;
@@ -137,7 +145,6 @@ public class MainActivity extends AppCompatActivity {
     private Button nextSong;
     private Button shuffle;
     private Switch autoplay;
-
 
     private void playSong() {
         final String musicFilePath = musicFilesList.get(mPosition);
@@ -155,7 +162,7 @@ public class MainActivity extends AppCompatActivity {
         isSongPlaying = true;
 
         if(flag2) {
-            new Thread() { //Thread koji updatea position na seekBaru
+            new Thread() {
                 public void run() { // thread is used so song isn't interrupted when seekBar is updated
                     while (true) {
                         try {
@@ -177,6 +184,12 @@ public class MainActivity extends AppCompatActivity {
                         });
                         if(songPosition == songDuration) {
                             isSongPlaying = false;
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    pauseButton.setText("");
+                                }
+                            });
                             notPaused = true; // song is over, but not paused
                             if (isAutoplayOn) {
                                 if(mPosition < musicFilesList.size() - 1) {
@@ -195,6 +208,8 @@ public class MainActivity extends AppCompatActivity {
                                     public void run() {
                                         songDurationTextView.setText(String.valueOf(songDuration / 60) + ":" + String.valueOf(songDuration % 60));
                                         pauseButton.setText("pause");
+                                        positions.add(mPosition);
+                                        darkenListView();
                                     }
                                 });
                                 songPosition = 0;
@@ -216,7 +231,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         if (!isMusicPlayerInit) {
-            final ListView listView = findViewById(R.id.listView);
+            listView = findViewById(R.id.listView);
             final TextAdapter textAdapter = new TextAdapter();
             musicFilesList = new ArrayList<>();
             fillMusicList();
@@ -251,7 +266,6 @@ public class MainActivity extends AppCompatActivity {
                     {
                         isSongPlaying = false;
                         pauseButton.setText("");
-                        //notPaused = true;
                     }
                     else {
                         if(pauseButton.getText().equals("pause")) {
@@ -276,6 +290,18 @@ public class MainActivity extends AppCompatActivity {
             backward10.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    if(songPosition == songDuration) {
+                        if(notPaused) {
+                            mp.pause();
+                        }
+                        notPaused = false;
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                pauseButton.setText("play");
+                            }
+                        });
+                    }
                     if(songPosition - 10 <= 0)
                     {
                         songPosition = 0;
@@ -317,6 +343,8 @@ public class MainActivity extends AppCompatActivity {
                     if (isSongPlaying) {
                         mp.pause();
                     }
+                    positions.add(mPosition);
+                    darkenListView();
                     playSong();
                 }
             });
@@ -337,6 +365,8 @@ public class MainActivity extends AppCompatActivity {
                     if (isSongPlaying) {
                         mp.pause();
                     }
+                    positions.add(mPosition);
+                    darkenListView();
                     playSong();
                 }
             });
@@ -353,8 +383,10 @@ public class MainActivity extends AppCompatActivity {
                 public void onClick(View v) {
                     mp.stop();
                     Random rand = new Random();
-                    mPosition = rand.nextInt( musicFilesList.size());
+                    mPosition = rand.nextInt(musicFilesList.size());
                     clickedSong = mPosition;
+                    positions.add(mPosition);
+                    darkenListView();
                     playSong();
                 }
             });
@@ -386,24 +418,33 @@ public class MainActivity extends AppCompatActivity {
                         clickedSong = position; // clickedSong will represent last clicked song
                         flag1 = true; // flag that is used to this if statement is executed only once, to establish clickedSong
                         flag2 = false; // flag that is used so there is only one thread created (instead of a thread for each song individually, increment problem solved)
+                        addViewsToList();
+                        positions.add(position);
+                        darkenListView();
                     }
                     else {
                         if (!isSongPlaying && notPaused) { // if the song is over
                             clickedSong = position;
                             mPosition = position;
                             playSong();
+                            positions.add(position);
+                            darkenListView();
                         } else {
                             if ((position != clickedSong) && isSongPlaying) { // if the user clicked a different song and if the song is playing
                                 clickedSong = position;
                                 mPosition = position;
                                 mp.pause();
                                 playSong();
+                                positions.add(position);
+                                darkenListView();
                             }
                             else if ((position != clickedSong) && !isSongPlaying) // if the user clicked a different song and if the song is not playing
                             {
                                 clickedSong = position;
                                 mPosition = position;
                                 playSong();
+                                positions.add(position);
+                                darkenListView();
                             }
                         }
                     }
@@ -412,6 +453,19 @@ public class MainActivity extends AppCompatActivity {
             isMusicPlayerInit = true;
         }
     }
+
+        protected void addViewsToList() {
+            for(int i = 0; i <= listView.getLastVisiblePosition() - listView.getFirstVisiblePosition(); i++) {
+                views.add(listView.getChildAt(i));
+            }
+        }
+
+        protected void darkenListView() {
+            views.get(positions.get(positions.size() - 1)).setBackgroundColor(Color.rgb(3, 218, 197));
+            if(positions.size() > 1 && positions.get(positions.size() - 2) != positions.get(positions.size() - 1)) {
+                views.get(positions.get(positions.size() - 2)).setBackgroundColor(Color.TRANSPARENT);
+            }
+        }
 
         class TextAdapter extends BaseAdapter {
             private List<String> data = new ArrayList<>();
@@ -443,7 +497,6 @@ public class MainActivity extends AppCompatActivity {
                     convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item, parent, false);
                     convertView.setTag(new ViewHolder((TextView) convertView.findViewById(R.id.myItem)));
                 }
-
                 ViewHolder holder = (ViewHolder) convertView.getTag();
                 final String item = data.get(position);
                 holder.info.setText(item.substring(item.lastIndexOf('/') + 1)); // '/' is used to point at filename, +1 is used so forward slash is not printed
@@ -453,7 +506,7 @@ public class MainActivity extends AppCompatActivity {
             class ViewHolder {
                 TextView info;
 
-                ViewHolder(TextView mInfo) { //konstruktor
+                ViewHolder(TextView mInfo) {
                     info = mInfo;
                 }
             }
