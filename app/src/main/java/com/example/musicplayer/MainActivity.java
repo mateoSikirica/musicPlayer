@@ -1,5 +1,6 @@
 package com.example.musicplayer;
 
+import androidx.annotation.UiThread;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.Manifest;
