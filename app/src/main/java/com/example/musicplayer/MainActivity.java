@@ -1,6 +1,5 @@
 package com.example.musicplayer;
 
-import androidx.annotation.UiThread;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.Manifest;
@@ -167,13 +166,14 @@ public class MainActivity extends AppCompatActivity {
                         });
                         if(songPosition == songDuration) {
                             isSongPlaying = false;
+                            mp.pause();
+                            notPaused = false;
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
                                     pauseButton.setText("");
                                 }
                             });
-                            notPaused = true; // song is over, but not paused
                             if (isAutoplayOn) {
                                 if(mPosition < musicFilesList.size() - 1) {
                                     mPosition++;
@@ -247,6 +247,8 @@ public class MainActivity extends AppCompatActivity {
                     }
                     if(songPosition == songDuration)
                     {
+                        notPaused = false;
+                        mp.pause();
                         isSongPlaying = false;
                         pauseButton.setText("");
                     }

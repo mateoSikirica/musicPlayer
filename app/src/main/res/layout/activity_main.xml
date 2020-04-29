@@ -73,8 +73,7 @@
             android:id="@+id/f10"
             android:layout_width="51dp"
             android:layout_height="51dp"
-            android:background="@drawable/ic_ff10"
-            android:paddingRight="30dp"/>
+            android:background="@drawable/ic_ff10"/>
 
 
         <Button
