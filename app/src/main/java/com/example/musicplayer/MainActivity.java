@@ -175,6 +175,7 @@ public class MainActivity extends AppCompatActivity {
                                 }
                             });
                             if (isAutoplayOn) {
+                                notPaused = true;
                                 if(mPosition < musicFilesList.size() - 1) {
                                     mPosition++;
                                 }
