@@ -44,8 +44,8 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal">
         <TextView
-            android:paddingStart="13dp"
-            android:paddingLeft="13dp"
+            android:paddingStart="11dp"
+            android:paddingLeft="11dp"
             android:id="@+id/currentPosition"
             android:layout_width="0dp"
             android:layout_weight="1"
@@ -53,38 +53,38 @@
 
         <Button
             android:id="@+id/prevSong"
-            android:layout_width="54dp"
-            android:layout_height="54dp"
+            android:layout_width="52dp"
+            android:layout_height="52dp"
             android:background="@drawable/ic_prevsong" />
 
         <Button
             android:id="@+id/b10"
-            android:layout_width="51dp"
-            android:layout_height="51dp"
+            android:layout_width="49dp"
+            android:layout_height="49dp"
             android:background="@drawable/ic_bw10" />
 
         <Button
             android:id="@+id/pauseButton"
             android:text="pause"
-            android:layout_width="100dp"
+            android:layout_width="81dp"
             android:layout_height="51dp" />
 
         <Button
             android:id="@+id/f10"
-            android:layout_width="51dp"
-            android:layout_height="51dp"
+            android:layout_width="49dp"
+            android:layout_height="49dp"
             android:background="@drawable/ic_ff10"/>
 
 
         <Button
             android:id="@+id/nextSong"
-            android:layout_width="54dp"
-            android:layout_height="54dp"
+            android:layout_width="52dp"
+            android:layout_height="52dp"
             android:background="@drawable/ic_nextsong" />
 
         <TextView
-            android:paddingEnd="13dp"
-            android:paddingRight="13dp"
+            android:paddingEnd="11dp"
+            android:paddingRight="11dp"
             android:gravity="end"
             android:id="@+id/songDuration"
             android:layout_width="0dp"

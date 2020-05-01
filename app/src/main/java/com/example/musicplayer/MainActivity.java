@@ -4,12 +4,19 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.Manifest;
 import android.app.ActivityManager;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,6 +27,7 @@ import android.widget.ListView;
 import android.widget.SeekBar;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -27,12 +35,45 @@ import java.util.List;
 import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        Toast.makeText(this, "SHAKE PHONE TO SWITCH TO NIGHT MODE", Toast.LENGTH_LONG).show();
+
+        SM = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        mySensor = SM.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        SM.registerListener(sensorListener, mySensor, SensorManager.SENSOR_DELAY_NORMAL);
+
+        acelVal = SensorManager.GRAVITY_EARTH;
+        acelVal = SensorManager.GRAVITY_EARTH;
+        shake = 0.00f;
     }
+
+    private final SensorEventListener sensorListener = new SensorEventListener() {
+        @Override
+        public void onSensorChanged(SensorEvent event) {
+            float x = event.values[0];
+            float y = event.values[1];
+            float z = event.values[2];
+
+            acelLast = acelVal;
+            acelVal = (float) Math.sqrt((double) (x*x + y*y + z*z));
+            float delta = acelVal -acelLast;
+            shake = shake * 0.9f + delta;
+
+            if(shake > 25) {
+                isNightModeOn = !isNightModeOn;
+                startOrEndNightMode();
+            }
+        }
+
+        @Override
+        public void onAccuracyChanged(Sensor sensor, int accuracy) {
+
+        }
+    };
 
     private static final String[] PERMISSIONS = {
             Manifest.permission.READ_EXTERNAL_STORAGE
@@ -48,6 +89,11 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         return false;
+    }
+
+    @Override
+    public void onBackPressed() {
+         moveTaskToBack(true);
     }
 
     @Override
@@ -101,11 +147,18 @@ public class MainActivity extends AppCompatActivity {
             return mp.getDuration();
     }
 
+    private Sensor mySensor;
+    private SensorManager SM;
+    private float acelVal; //current acceleration value and gravity
+    private float acelLast; //last acceleration value and gravity
+    private float shake; //acceleration value differ from gravity
+    private boolean isNightModeOn = false;
+
     private int clickedSong;
     private boolean flag1 = false;
     private int songPosition;
     private volatile boolean isSongPlaying;
-    private int mPosition;
+    private int mPosition = -1;
     private boolean flag2 = true;
     private boolean notPaused = true;
     private boolean isVisible = false;
@@ -399,6 +452,12 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) { //position is the position of the song that the user clicked
                     if(!flag1) { // flag1 is initially false, this if statement will only be executed once
+                        if(mPosition == -1 && isNightModeOn) {
+                            autoplayAndShuffle.setBackgroundColor(Color.DKGRAY);
+                            playbackControls.setBackgroundColor(Color.DKGRAY);
+                            seekBar.setBackgroundColor(Color.DKGRAY);
+                        }
+
                         mPosition = position;
                         playSong();
                         clickedSong = position; // clickedSong will represent last clicked song
@@ -447,11 +506,19 @@ public class MainActivity extends AppCompatActivity {
         }
 
         protected void darkenListView() {
-            views.get(positions.get(positions.size() - 1)).setBackgroundColor(Color.rgb(3, 218, 197));
+            if(isNightModeOn) {
+                views.get(positions.get(positions.size() - 1)).setBackgroundColor(Color.GRAY);
+            }
+            else {
+                views.get(positions.get(positions.size() - 1)).setBackgroundColor(Color.rgb(3, 218, 197));
+            }
             if(positions.size() > 1 && positions.get(positions.size() - 2) != positions.get(positions.size() - 1)) {
                 views.get(positions.get(positions.size() - 2)).setBackgroundColor(Color.TRANSPARENT);
             }
         }
+
+        TextAdapter.ViewHolder holder;
+        List<TextAdapter.ViewHolder> holdersList = new ArrayList<>();
 
         class TextAdapter extends BaseAdapter {
             private List<String> data = new ArrayList<>();
@@ -479,11 +546,14 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public View getView(int position, View convertView, ViewGroup parent) {
-                if(convertView == null) {
+                if (convertView == null) {
                     convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item, parent, false);
                     convertView.setTag(new ViewHolder((TextView) convertView.findViewById(R.id.myItem)));
                 }
-                ViewHolder holder = (ViewHolder) convertView.getTag();
+                holder = (ViewHolder) convertView.getTag();
+
+                holdersList.add(holder);
+
                 final String item = data.get(position);
                 holder.info.setText(item.substring(item.lastIndexOf('/') + 1)); // '/' is used to point at filename, +1 is used so forward slash is not printed
                 return convertView;
@@ -497,4 +567,33 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         }
+
+    private void startOrEndNightMode() {
+        for(int i = 0; i < holdersList.size(); i++) {
+            if(isNightModeOn) {
+                holdersList.get(i).info.setBackgroundColor(Color.DKGRAY);
+                holdersList.get(i).info.setTextColor(Color.RED);
+                listView.setBackgroundColor(Color.DKGRAY);
+
+                if(mPosition != -1) {
+                    darkenListView();
+                    autoplayAndShuffle.setBackgroundColor(Color.DKGRAY);
+                    playbackControls.setBackgroundColor(Color.DKGRAY);
+                    seekBar.setBackgroundColor(Color.DKGRAY);
+                }
+            }
+            else{
+                holdersList.get(i).info.setBackgroundColor(Color.TRANSPARENT);
+                holdersList.get(i).info.setTextColor(Color.BLACK);
+                listView.setBackgroundColor(Color.TRANSPARENT);
+
+                if(mPosition != -1) {
+                    darkenListView();
+                    autoplayAndShuffle.setBackgroundColor(Color.TRANSPARENT);
+                    playbackControls.setBackgroundColor(Color.TRANSPARENT);
+                    seekBar.setBackgroundColor(Color.TRANSPARENT);
+                }
+            }
+        }
+    }
 }
