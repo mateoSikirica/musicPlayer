@@ -5,7 +5,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.Manifest;
 import android.app.ActivityManager;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.hardware.Sensor;
@@ -16,7 +15,6 @@ import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -52,15 +50,16 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private final SensorEventListener sensorListener = new SensorEventListener() {
+        float x, y, z;
         @Override
         public void onSensorChanged(SensorEvent event) {
-            float x = event.values[0];
-            float y = event.values[1];
-            float z = event.values[2];
+            x = event.values[0];
+            y = event.values[1];
+            z = event.values[2];
 
             acelLast = acelVal;
             acelVal = (float) Math.sqrt((double) (x*x + y*y + z*z));
-            float delta = acelVal -acelLast;
+            float delta = acelVal - acelLast;
             shake = shake * 0.9f + delta;
 
             if(shake > 25) {
@@ -109,7 +108,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private boolean isMusicPlayerInit;
-    private List<String> musicFilesList; // list with file (song) paths
+    private List<String> musicFilesList; // list with file (song) path
 
     private void addMusicFilesFrom(String dirPath) {
         final File musicDir = new File(dirPath);
@@ -153,6 +152,7 @@ public class MainActivity extends AppCompatActivity {
     private float acelLast; //last acceleration value and gravity
     private float shake; //acceleration value differ from gravity
     private boolean isNightModeOn = false;
+    private boolean wasPhoneShaken = false;
 
     private int clickedSong;
     private boolean flag1 = false;
@@ -572,7 +572,6 @@ public class MainActivity extends AppCompatActivity {
         for(int i = 0; i < holdersList.size(); i++) {
             if(isNightModeOn) {
                 holdersList.get(i).info.setBackgroundColor(Color.DKGRAY);
-                holdersList.get(i).info.setTextColor(Color.RED);
                 listView.setBackgroundColor(Color.DKGRAY);
 
                 if(mPosition != -1) {
