@@ -62,7 +62,7 @@ public class MainActivity extends AppCompatActivity {
             float delta = acelVal - acelLast;
             shake = shake * 0.9f + delta;
 
-            if(shake > 25) {
+            if(shake > 13) {
                 isNightModeOn = !isNightModeOn;
                 startOrEndNightMode();
             }
