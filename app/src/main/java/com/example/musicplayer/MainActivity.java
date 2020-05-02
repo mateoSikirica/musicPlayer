@@ -574,8 +574,8 @@ public class MainActivity extends AppCompatActivity {
                 holdersList.get(i).info.setBackgroundColor(Color.DKGRAY);
                 listView.setBackgroundColor(Color.DKGRAY);
 
-                if(mPosition != -1) {
-                    darkenListView();
+                if(mPosition != -1) { //put below attributes in dark mode only when the user chooses the first song
+                    darkenListView(); //if there was no if, bug would occur because these attributes appear only when the first song is chosen
                     autoplayAndShuffle.setBackgroundColor(Color.DKGRAY);
                     playbackControls.setBackgroundColor(Color.DKGRAY);
                     seekBar.setBackgroundColor(Color.DKGRAY);
