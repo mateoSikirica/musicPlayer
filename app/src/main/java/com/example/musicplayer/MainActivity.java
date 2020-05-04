@@ -62,7 +62,8 @@ public class MainActivity extends AppCompatActivity {
             float delta = acelVal - acelLast;
             shake = shake * 0.9f + delta;
 
-            if(shake > 13) {
+            if(shake > 12 && ((whenWasPhoneShaken + 1200) < System.currentTimeMillis())) { // after the phone was shaken (night mode turned on/off),
+                whenWasPhoneShaken = System.currentTimeMillis();                           //wait at least 1.2 seconds before it can be turned off/on again
                 isNightModeOn = !isNightModeOn;
                 startOrEndNightMode();
             }
@@ -152,7 +153,7 @@ public class MainActivity extends AppCompatActivity {
     private float acelLast; //last acceleration value and gravity
     private float shake; //acceleration value differ from gravity
     private boolean isNightModeOn = false;
-    private boolean wasPhoneShaken = false;
+    private long whenWasPhoneShaken = Long.MIN_VALUE;
 
     private int clickedSong;
     private boolean flag1 = false;
@@ -556,6 +557,7 @@ public class MainActivity extends AppCompatActivity {
 
                 final String item = data.get(position);
                 holder.info.setText(item.substring(item.lastIndexOf('/') + 1)); // '/' is used to point at filename, +1 is used so forward slash is not printed
+
                 return convertView;
             }
 
