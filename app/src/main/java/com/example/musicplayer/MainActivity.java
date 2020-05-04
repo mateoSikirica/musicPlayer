@@ -38,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Toast.makeText(this, "SHAKE PHONE TO SWITCH TO NIGHT MODE", Toast.LENGTH_LONG).show();
+        Toast.makeText(this, "SHAKE PHONE TO TURN ON/OFF NIGHT MODE", Toast.LENGTH_LONG).show();
 
         SM = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         mySensor = SM.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
@@ -62,8 +62,8 @@ public class MainActivity extends AppCompatActivity {
             float delta = acelVal - acelLast;
             shake = shake * 0.9f + delta;
 
-            if(shake > 12 && ((whenWasPhoneShaken + 1200) < System.currentTimeMillis())) { // after the phone was shaken (night mode turned on/off),
-                whenWasPhoneShaken = System.currentTimeMillis();                           //wait at least 1.2 seconds before it can be turned off/on again
+            if(shake > 19 && ((whenWasPhoneShaken + 1250) < System.currentTimeMillis())) { // after the phone was shaken (night mode turned on/off),
+                whenWasPhoneShaken = System.currentTimeMillis();                           //wait at least 1.25 seconds before it can be turned off/on again
                 isNightModeOn = !isNightModeOn;
                 startOrEndNightMode();
             }
